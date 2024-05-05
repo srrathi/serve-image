@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	database "github.com/srrathi/image-server/db"
 	"github.com/srrathi/image-server/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -20,7 +20,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var loadEnv = utils.LoadEnvFile()
+var _ = utils.LoadEnvFile()
+
 // Client instance
 var DB *mongo.Client = database.ConnectDB()
 var name = "photos"
@@ -36,7 +37,7 @@ func GetCollection(client *mongo.Client, collectionName string) *mongo.Collectio
 // Upload image handler
 func uploadImage() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		file, header, err := c.Request.FormFile("image")
+		file, _, err := c.Request.FormFile("image")
 		if err != nil {
 			log.Println(err)
 			c.JSON(http.StatusBadRequest, err.Error())
@@ -53,14 +54,15 @@ func uploadImage() gin.HandlerFunc {
 			return
 		}
 
-		buf := bytes.NewBuffer(nil)
-		if _, err := io.Copy(buf, file); err != nil {
+		buf, err := utils.ConvertImageToWebp(file)
+		if err != nil {
 			log.Println(err)
 			c.JSON(http.StatusBadRequest, err.Error())
 			return
 		}
 
-		filename := time.Now().Format(time.RFC3339) + "_" + header.Filename
+		id := uuid.New()
+		filename := time.Now().Format(time.RFC3339) + "_" + id.String() + ".webp"
 		uploadStream, err := bucket.OpenUploadStream(
 			filename,
 		)
