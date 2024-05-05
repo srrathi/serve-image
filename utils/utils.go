@@ -45,7 +45,7 @@ func (c *allCache) Update(id string, image []byte) {
 func GetEnvVariable(key string) string {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Error loading .env file")
 	}
 	return os.Getenv(key)
 }
