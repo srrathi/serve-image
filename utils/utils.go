@@ -1,9 +1,16 @@
 package utils
 
 import (
+	"bytes"
+	"image"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"log"
+	"mime/multipart"
 	"time"
 
+	webp "github.com/chai2010/webp"
 	"github.com/joho/godotenv"
 	"github.com/patrickmn/go-cache"
 )
@@ -49,4 +56,23 @@ func LoadEnvFile() string {
 	}
 	log.Println(".env file loaded")
 	return ".env file loaded"
+}
+
+func ConvertImageToWebp(file multipart.File) (*bytes.Buffer, error) {
+	// Decode the image from multipart file
+	if _, err := file.Seek(0, 0); err != nil {
+		if err != nil {
+			return nil, err
+		}
+	}
+	m, _, err := image.Decode(file)
+	if err != nil {
+		return nil, err
+	}
+	buff := bytes.NewBuffer(nil)
+	err = webp.Encode(buff, m, &webp.Options{Lossless: true})
+	if err != nil {
+		return nil, err
+	}
+	return buff, nil
 }
