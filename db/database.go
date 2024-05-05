@@ -3,9 +3,9 @@ package database
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
-	"github.com/srrathi/image-server/utils"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -16,7 +16,7 @@ func ConnectDB() *mongo.Client {
 	defer cancel()
 
 	// To get mongodb connection URI from .env file
-	uri := utils.GetEnvVariable("MONGOURI")
+	uri := os.Getenv("MONGOURI")
 	// mongo.Connect return mongo.Client method
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {

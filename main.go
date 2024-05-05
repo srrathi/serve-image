@@ -20,6 +20,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var loadEnv = utils.LoadEnvFile()
 // Client instance
 var DB *mongo.Client = database.ConnectDB()
 var name = "photos"

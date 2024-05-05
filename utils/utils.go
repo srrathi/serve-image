@@ -2,7 +2,6 @@ package utils
 
 import (
 	"log"
-	"os"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -42,10 +41,12 @@ func (c *allCache) Update(id string, image []byte) {
 	c.images.Set(id, image, cache.DefaultExpiration)
 }
 
-func GetEnvVariable(key string) string {
+func LoadEnvFile() string {
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("Error loading .env file")
+		return "Error loading .env file"
 	}
-	return os.Getenv(key)
+	log.Println(".env file loaded")
+	return ".env file loaded"
 }
